@@ -1,0 +1,24 @@
+# Tells Docker Compose that the following blocks define the containerized services to run
+services:
+  # The name of this individual service inside Compose (you can refer to it as "api")
+  api:
+    # Instructs Docker on how to build the container image dynamically
+    build:
+      # Sets the build context (root folder) to the current directory where docker-compose.yml lives
+      context: .
+      # Specifies the exact Dockerfile to use for building this image
+      dockerfile: Dockerfile
+    # Assigns a custom, fixed name to the container instead of an auto-generated one
+    container_name: nest_backend_1
+    # Maps host computer ports to container ports using the variable from your .env file (e.g., 3000:3000)
+    ports:
+      - "${PORT}:${PORT}"
+    # Loads environment variables directly from your local .env file into the container runtime
+    env_file:
+      - .env
+    # Mounts files between your host computer and the container
+    volumes:
+      # Syncs your host code directory (.) to /app inside the container in real time for hot-reloading
+      - .:/app
+      # Prevents your local node_modules from overwriting the container's Linux-built node_modules
+      - /app/node_modules
