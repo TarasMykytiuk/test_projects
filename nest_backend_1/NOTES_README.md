@@ -8,3 +8,22 @@ than at 'http://localhost:3000/' --> see: 'Hello world!'
 # 2. Run app inside docker container
 create Dockerfile | docker-compose.yml | .env.example | .env
 $ docker compose up --build
+# 3. Add Prisma 7 database
+modify docker-compose.yml | .env.example | .env | Dockerfile
+inside nest_backend_1 folder:
+$ npm install -D prisma@^7.0.0
+$ npm install @prisma/client@^7.0.0 @prisma/adapter-pg pg
+$ npm install -D @types/pg
+modify ./prisma/schema.prisma file
+rename prisma7.config.ts into prisma.config.ts and modify
+modify tsconfig.json
+$ npx prisma generate
+$ npx nest g module prisma
+$ npx nest g service prisma --no-spec
+modify prisma.service.ts | prisma.module.ts
+$ npm install prisma@^7.0.0 --save-prod ???
+$ docker compose exec api npm install
+$ docker compose exec api npx prisma generate
+$ docker compose exec api npx prisma migrate dev --name init
+$ docker compose up --build
+than at 'http://localhost:3000/' --> see: 'Hello! This message is changed.'
