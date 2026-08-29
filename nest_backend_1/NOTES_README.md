@@ -52,3 +52,13 @@ curl -X POST http://localhost:3000/auth/register \
     "password": "1234qwer!Q"
   }' | jq
 ---------------------------------
+modify main.ts --> add swagger
+modify auth.controller.ts | auth.service.ts | auth.module.ts
+---------------------------------
+curl -X POST http://localhost:3000/auth/login \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "first@email.com",
+    "password": "1234qwer!Q"
+  }'
+---------------------------------
