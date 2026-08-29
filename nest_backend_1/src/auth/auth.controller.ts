@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Res } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegistrationDto } from './dto/registration.dto.js';
 import {
@@ -11,7 +11,8 @@ import {
     ApiUnauthorizedResponse
 } from '@nestjs/swagger';
 import { LoginDto } from './dto/login.dto.js';
-import { AuthResponseDto } from './dto/auth-response.dto.js';
+import { UserResponseDto } from './dto/user-response.dto.js';
+import type { Response } from 'express';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -20,19 +21,29 @@ export class AuthController {
     @Post('register')
     @HttpCode(HttpStatus.CREATED)
     @ApiOperation({ summary: 'Create user account' })
-    @ApiCreatedResponse({ description: 'User successfully registered.', type: RegistrationDto })
+    @ApiCreatedResponse({ description: 'User successfully registered.', type: UserResponseDto })
     @ApiBadRequestResponse({ description: 'Input failed validation.' })
     @ApiConflictResponse({ description: 'Email already registered.' })
-    register(@Body() dto: RegistrationDto) {
+    register(@Body() dto: RegistrationDto): Promise<UserResponseDto> {
         return this.authService.registerUser(dto);
     }
 
     @Post('login')
     @HttpCode(HttpStatus.OK)
     @ApiOperation({ summary: 'Log in user and return access token' })
-    @ApiOkResponse({ description: 'Login successful', type: AuthResponseDto })
+    @ApiOkResponse({ description: 'Login successful', type: UserResponseDto })
     @ApiUnauthorizedResponse({ description: 'Invalid credentials' })
-    login(@Body() dto: LoginDto) {
-        return this.authService.loginUser(dto);
+    async login(@Body() dto: LoginDto, @Res({ passthrough: true }) response: Response): Promise<UserResponseDto> {
+        const { accessToken, user } = await this.authService.loginUser(dto);
+
+        response.cookie('session_token', accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'none',
+            maxAge: 1000 * 60 * 60 * 2,
+            path: '/',
+        });
+
+        return user;
     }
 }

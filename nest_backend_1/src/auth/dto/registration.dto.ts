@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, MinLength, Matches } from 'class-validator';
+import { IsString, IsEmail, MinLength, Matches } from 'class-validator';
+import { Transform } from 'class-transformer';
 
 export class RegistrationDto {
     @ApiProperty({
@@ -13,6 +14,8 @@ export class RegistrationDto {
         description: 'A valid and unique email address',
     })
     @IsString()
+    @IsEmail({}, { message: 'Must be a valid email address.' })
+    @Transform(({ value }: { value: string }) => value?.trim().toLowerCase())
     email!: string;
 
     @ApiProperty({

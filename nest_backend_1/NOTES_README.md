@@ -86,7 +86,7 @@ create files: src/auth/guards/jwt-auth.guard.ts
 ---------------------------------
 
 ```bash
-curl -X POST http://localhost:3000/auth/register \
+curl -s -D /dev/stderr -X POST http://localhost:3000/auth/register \
   -H "Content-Type: application/json" \
   -d '{
     "name": "First User",
@@ -103,7 +103,7 @@ modify auth.controller.ts | auth.service.ts | auth.module.ts
 ---------------------------------
 
 ```bash
-curl -X POST http://localhost:3000/auth/login \
+curl -i -X POST http://localhost:3000/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "first@email.com",
