@@ -1,4 +1,4 @@
-import { Controller, Post, HttpCode, HttpStatus, Body, Res } from '@nestjs/common';
+import { Controller, Post, HttpCode, HttpStatus, Body, Res, Get, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service.js';
 import { RegistrationDto } from './dto/registration.dto.js';
 import {
@@ -13,6 +13,8 @@ import {
 import { LoginDto } from './dto/login.dto.js';
 import { UserResponseDto } from './dto/user-response.dto.js';
 import type { Response } from 'express';
+import { CurrentUser } from './decorators/current-user.decorator.js';
+import { JwtAuthGuard } from './guards/jwt-auth.guard.js';
 
 @ApiTags('Authentication')
 @Controller('auth')
@@ -45,5 +47,15 @@ export class AuthController {
         });
 
         return user;
+    }
+
+    @Get('me')
+    @UseGuards(JwtAuthGuard)
+    @HttpCode(HttpStatus.OK)
+    @ApiOperation({ summary: 'Get info about yourself' })
+    @ApiOkResponse({ description: 'Information returned', type: UserResponseDto })
+    @ApiUnauthorizedResponse({ description: 'Unauthorized / Missing or invalid token' })
+    async getUserInfo(@CurrentUser('userId') userId: string): Promise<UserResponseDto> {
+        return this.authService.getUserById(userId);
     }
 }
